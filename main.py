@@ -1,4 +1,6 @@
 import sys
+import json
+from pathlib import Path
 from PyQt6.QtWidgets import ( 
     QApplication,
     QWidget,
@@ -6,17 +8,38 @@ from PyQt6.QtWidgets import (
     QPushButton
 
     )
-from PyQt6.QtGui import QScreen
+from PyQt6.QtGui import (
+    QIcon
+)
 
-app = QApplication(sys.argv)
+#stores all saved passwords
+passwords = {
 
-window = QWidget()
-window.setWindowTitle("Password Manager")
-window.setGeometry(100, 100, 400, 200)
+}
 
-label = QLabel("Hello, World", parent=window)
-label.move(150, 90)
 
-window.show()
+#def new_password():
 
-sys.exit(app.exec())
+class Window:
+    def __init__(self):
+        return
+    #def center_window(window_instance) ->int:
+        
+
+class Encryption:
+    def __init__(self):
+        return
+    
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    script_path = Path(__file__)
+    script_dir = script_path.parent
+    app_icon_path = script_dir / "images" / "icon.svg"
+    app_icon_object = QIcon(str(app_icon_path))
+    window = QWidget()
+    window.setWindowTitle("Password Manager")
+    window.setWindowIcon(app_icon_object)
+    window.resize(800, 600)
+    window.show()
+    sys.exit(app.exec())
