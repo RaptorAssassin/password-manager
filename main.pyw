@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLineEdit,
     QDialog,
+    QMessageBox,
     QAbstractItemView
     )
 from PyQt6.QtGui import (
@@ -24,6 +25,7 @@ from PyQt6.QtCore import (
 )
 
 #stores all saved, encrypted passwords
+#TODO: passwords should be saved in a file
 passwords = {
     "name": "password",
     "name2": "password2",
@@ -62,17 +64,29 @@ class MainWindow(QWidget):
         for name in passwords.keys():
             item = QListWidgetItem(name)
             self.list_widget.addItem(item)
+            global password_dialog
+            self.list_widget.itemClicked.connect(self.show_password(name))
+
+    #show the password dialog
+    def show_password(self, name):
+        password_dialog = PasswordDialog()
+        password_dialog.show_password(name)
 
 
 #handles master password popup
 class LoginDialog(QDialog):
     def __init__(self):
         super().__init__() 
+
+        #window options
         self.setWindowTitle("Enter Master Password")
         self.resize(400, 50)
         self.setFixedSize(self.size())
+
+        #create layout, master password input and submit button
         self.password_input = QLineEdit()
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password) #hides the password
+        self.password_input.setPlaceholderText("Password")
         self.submit_button = QPushButton("Submit")
         self.main_layout = QVBoxLayout()
         self.setLayout(self.main_layout)
@@ -80,6 +94,7 @@ class LoginDialog(QDialog):
         self.input_layout.addWidget(self.password_input)
         self.input_layout.addWidget(self.submit_button)
         self.main_layout.addLayout(self.input_layout)
+
         global master_password_input
         master_password_input = self.password_input.text()
         self.submit_button.clicked.connect(self.accept_password) 
@@ -92,14 +107,77 @@ class LoginDialog(QDialog):
             self.accept()
 
 
-#handles encryption, decryption and storing of passwords
+class PasswordDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+
+        #window options
+        self.setWindowTitle("Password")
+        self.resize(400,50)
+        self.setFixedSize(self.size())
+
+        #create layout, add input to copy the password 
+        self.password_display = QLineEdit()
+        self.password_display.setReadOnly(True)
+        self.copy_button = QPushButton("Copy Password")
+        self.copy_button.clicked.connect(self.copy_password(self.decrypted_password))
+        self.delete_button = QPushButton("Delete Password")
+        self.delete_button.clicked.connect(self.delete_password(password_name))
+        self.main_layout = QVBoxLayout()
+        self.main_layout.addWidget(self.password_display)
+        self.main_layout.addWidget(self.copy_button)
+        self.main_layout.addWidget(self.delete_button)
+
+        #password stuff
+        self.password_name = ""
+        self.encrypted_password = ""
+        self.decrypted_password = ""
+
+    def show_password(self, password):
+        name = password
+        if name in passwords:
+            self.encrypted_password = passwords[name]
+            self.decrypted_password = Encryption.decrypt(master_password_input)
+            self.password_display.setText(self.decrypted_password)
+            global password_name
+            password_name = name
+            self.show()
+            print(f"showing password popup with password from {password_name}")
+
+    def copy_password(self):
+        clipboard = QApplication.clipboard()
+        clipboard.setText(self.decrypted_password)
+        self.copy_button.setText("Copied")
+        print("copied password to clipboard")
+
+    def delete_password(self, password):
+        pass
+        print("deleted password")
+        
+
+#handles encryption and decryption of passwords
 class Encryption:
     def __init__(self):
         return
     
+    def encrypt(self, password):
+        pass
 
+    def decrypt(self, password):
+        pass
+
+#handles storing of passwords
+class Storage:
+    def __init__(self):
+        pass
+
+        
 #main loop
 def main():
+
+    #variables
+    password_name = str
+
     app = QApplication(sys.argv)
     
     #create and show main password manager window
@@ -116,7 +194,11 @@ def main():
     print(master_password_input)
     main_window.list_passwords()
     app.exec()
-    
+    password_dialog = PasswordDialog()
+    running = True
+    while running:
+        pass
+        
 if __name__ == "__main__":
     main()
     
