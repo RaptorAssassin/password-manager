@@ -24,6 +24,11 @@ from PyQt6.QtCore import (
     QPoint
 )
 
+
+#variables
+password_name = str
+master_password_input = str
+
 #stores all saved, encrypted passwords
 #TODO: passwords should be saved in a file
 passwords = {
@@ -36,6 +41,9 @@ passwords = {
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+
+        #variables
+        global password_name
 
         #window actions
         self.setWindowTitle("Password Manager")
@@ -64,13 +72,12 @@ class MainWindow(QWidget):
         for name in passwords.keys():
             item = QListWidgetItem(name)
             self.list_widget.addItem(item)
-            global password_dialog
-            self.list_widget.itemClicked.connect(self.show_password(name))
+            self.list_widget.itemClicked.connect(self.show_password)
 
     #show the password dialog
-    def show_password(self, name):
+    def show_password(self):
         password_dialog = PasswordDialog()
-        password_dialog.show_password(name)
+        password_dialog.show_password(password_name)
 
 
 #handles master password popup
@@ -111,27 +118,27 @@ class PasswordDialog(QDialog):
     def __init__(self):
         super().__init__()
 
+        #password stuff
+        self.password_name = ""
+        self.encrypted_password = ""
+        self.decrypted_password = ""
+        
         #window options
         self.setWindowTitle("Password")
         self.resize(400,50)
         self.setFixedSize(self.size())
 
-        #create layout, add input to copy the password 
+        #create layout, add input to copy the password from manually
         self.password_display = QLineEdit()
         self.password_display.setReadOnly(True)
         self.copy_button = QPushButton("Copy Password")
-        self.copy_button.clicked.connect(self.copy_password(self.decrypted_password))
+        self.copy_button.clicked.connect(self.copy_password)
         self.delete_button = QPushButton("Delete Password")
-        self.delete_button.clicked.connect(self.delete_password(password_name))
+        self.delete_button.clicked.connect(lambda: self.delete_password(password_name))
         self.main_layout = QVBoxLayout()
         self.main_layout.addWidget(self.password_display)
         self.main_layout.addWidget(self.copy_button)
         self.main_layout.addWidget(self.delete_button)
-
-        #password stuff
-        self.password_name = ""
-        self.encrypted_password = ""
-        self.decrypted_password = ""
 
     def show_password(self, password):
         name = password
@@ -160,10 +167,10 @@ class Encryption:
     def __init__(self):
         return
     
-    def encrypt(self, password):
+    def encrypt(password):
         pass
 
-    def decrypt(self, password):
+    def decrypt(password):
         pass
 
 #handles storing of passwords
@@ -176,7 +183,7 @@ class Storage:
 def main():
 
     #variables
-    password_name = str
+    
 
     app = QApplication(sys.argv)
     
